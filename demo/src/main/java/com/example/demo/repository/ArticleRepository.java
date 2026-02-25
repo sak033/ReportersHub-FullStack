@@ -10,4 +10,5 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     List<Article> findByStatus(ArticleStatus status);
     List<Article> findByCreatedByIdAndStatus(Long userId, ArticleStatus status);
+    List<Article> findByCreatedById(Long userId);
 }

@@ -12,6 +12,7 @@ import com.example.demo.dto.ArticleSummaryDTO;
 import com.example.demo.dto.ReporterProfileDTO;
 import com.example.demo.repository.RatingRepository;
 import com.example.demo.dto.TopReporterDTO;
+import com.example.demo.dto.ReporterDashboardDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,8 @@ public class ReporterController {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private  final  RatingRepository ratingRepository;
+
+
 
     public ReporterController(UserRepository userRepository,
                               ArticleRepository articleRepository,
@@ -54,13 +57,19 @@ public class ReporterController {
                 .map(a -> new ArticleSummaryDTO(
                         a.getId(),
                         a.getTitle(),
-                        a.getCreatedAt()
+                        a.getCreatedAt(),
+                        a.getStatus().name()
                 ))
                 .toList();
+
+        // 🔥 ADD THIS
+        Double averageRating =
+                ratingRepository.findAverageRatingByReporterId(id);
 
         return new ReporterProfileDTO(
                 user.getId(),
                 user.getName(),
+                averageRating != null ? averageRating : 0.0,
                 articleDTOs
         );
     }
@@ -125,5 +134,40 @@ public class ReporterController {
                     );
                 })
                 .toList();
+    }
+    @PreAuthorize("hasRole('REPORTER')")
+    @GetMapping("/dashboard")
+    public ReporterDashboardDTO getDashboard(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        User reporter = userRepository.findByEmail(email)
+                .orElseThrow();
+
+        // Get all articles (all statuses)
+        List<Article> articles =
+                articleRepository.findByCreatedById(reporter.getId());
+
+        List<ArticleSummaryDTO> articleDTOs = articles.stream()
+                .map(a -> new ArticleSummaryDTO(
+                        a.getId(),
+                        a.getTitle(),
+                        a.getCreatedAt(),
+                        a.getStatus().name()
+                ))
+                .toList();
+
+        Double avgRating =
+                ratingRepository.findAverageRatingByReporterId(reporter.getId());
+
+        Long totalRatings =
+                ratingRepository.countByReporterId(reporter.getId());
+
+        return new ReporterDashboardDTO(
+                reporter.getName(),
+                avgRating != null ? avgRating : 0.0,
+                totalRatings != null ? totalRatings : 0L,
+                articleDTOs
+        );
     }
 }

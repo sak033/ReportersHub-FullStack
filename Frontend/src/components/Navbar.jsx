@@ -12,6 +12,7 @@ function Navbar() {
   return (
     <div style={{ padding: "10px", borderBottom: "1px solid gray" }}>
       <Link to="/">Home</Link>
+      <a href="/dashboard">Dashboard</a>
 
       {token ? (
         <button onClick={handleLogout} style={{ marginLeft: "10px" }}>

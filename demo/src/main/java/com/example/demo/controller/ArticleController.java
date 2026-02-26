@@ -56,4 +56,22 @@ public class ArticleController {
     public List<Article> getApprovedArticles() {
         return articleRepository.findByStatus(ArticleStatus.APPROVED);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/reject/{id}")
+    public String rejectArticle(@PathVariable Long id) {
+
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Article not found"));
+
+        article.setStatus(ArticleStatus.REJECTED);
+        articleRepository.save(article);
+
+        return "Article rejected.";
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/pending")
+    public List<Article> getPendingArticles() {
+        return articleRepository.findByStatus(ArticleStatus.PENDING);
+    }
 }

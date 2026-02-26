@@ -47,6 +47,7 @@ public class UserController {
         return "Working";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {
 
@@ -83,6 +84,8 @@ public class UserController {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/request-reporter")
     public String requestReporter(Authentication authentication) {
 
@@ -123,5 +126,10 @@ public class UserController {
         userRepository.save(user);
 
         return "User promoted to REPORTER successfully.";
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/reporter-requests")
+    public List<User> getReporterRequests() {
+        return userRepository.findByReporterStatus(ReporterStatus.PENDING);
     }
 }

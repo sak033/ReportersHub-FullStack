@@ -9,18 +9,38 @@ function Login() {
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    api.post("/auth/login", { email, password })
-      .then(res => {
-        localStorage.setItem("token", res.data.token);
-        navigate("/");
-      })
-      .catch(() => {
-        setError("Invalid credentials");
+  api.post("/auth/login", { email, password })
+    .then(res => {
+      const token = res.data.token;
+
+      // Save token
+      localStorage.setItem("token", token);
+
+      // Fetch user info
+      return api.get("/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
-  };
+    })
+    .then(res => {
+      // Save role
+      localStorage.setItem("role", res.data.role);
 
+      if (res.data.role === "ADMIN") {
+  navigate("/admin");
+} else if (res.data.role === "REPORTER") {
+  navigate("/dashboard");
+} else {
+  navigate("/");
+}
+    })
+    .catch(() => {
+      setError("Invalid credentials");
+    });
+};
   return (
     <div style={{ padding: "20px" }}>
       <h1>Login</h1>

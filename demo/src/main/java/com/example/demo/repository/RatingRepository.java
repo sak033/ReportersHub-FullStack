@@ -15,11 +15,11 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
 
     List<Rating> findByReporter(User reporter);
     @Query("""
-       SELECT r.reporter.id, AVG(r.value)
-       FROM Rating r
-       GROUP BY r.reporter.id
-       ORDER BY AVG(r.value) DESC
-       """)
+   SELECT r.reporter.id, AVG(r.value)
+   FROM Rating r
+   GROUP BY r.reporter.id
+   ORDER BY AVG(r.value) DESC
+   """)
     List<Object[]> findTopReporters();
 
     @Query("SELECT AVG(r.value) FROM Rating r WHERE r.reporter.id = :reporterId")

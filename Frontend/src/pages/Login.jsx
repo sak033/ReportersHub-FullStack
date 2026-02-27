@@ -6,7 +6,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  
 
   const handleLogin = (e) => {
   e.preventDefault();
@@ -29,12 +29,15 @@ function Login() {
       // Save role
       localStorage.setItem("role", res.data.role);
 
-      if (res.data.role === "ADMIN") {
-  navigate("/admin");
-} else if (res.data.role === "REPORTER") {
-  navigate("/dashboard");
+    const role = res.data.role;
+localStorage.setItem("role", role);
+
+if (role === "ADMIN") {
+  window.location.href = "/admin";
+} else if (role === "REPORTER") {
+  window.location.href = "/dashboard";
 } else {
-  navigate("/");
+  window.location.href = "/";
 }
     })
     .catch(() => {

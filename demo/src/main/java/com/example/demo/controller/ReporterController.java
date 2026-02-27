@@ -117,22 +117,27 @@ public class ReporterController {
     @GetMapping("/top")
     public List<TopReporterDTO> getTopReporters() {
 
-        List<Object[]> results = ratingRepository.findTopReporters();
+        List<User> reporters = userRepository.findByRole(Role.REPORTER);
 
-        return results.stream()
-                .map(r -> {
-                    Long reporterId = (Long) r[0];
-                    Double avgRating = (Double) r[1];
+        return reporters.stream()
+                .map(reporter -> {
 
-                    User reporter = userRepository.findById(reporterId)
-                            .orElseThrow();
+                    Double avg =
+                            ratingRepository.findAverageRatingByReporterId(reporter.getId());
+
+                    Long total =
+                            ratingRepository.countByReporterId(reporter.getId());
 
                     return new TopReporterDTO(
-                            reporterId,
+                            reporter.getId(),
                             reporter.getName(),
-                            Math.round(avgRating * 10.0) / 10.0
+                            avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0,
+                            total != null ? total : 0L
                     );
                 })
+                .sorted((r1, r2) ->
+                        Double.compare(r2.getAverageRating(), r1.getAverageRating())
+                )
                 .toList();
     }
     @PreAuthorize("hasRole('REPORTER')")

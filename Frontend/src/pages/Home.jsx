@@ -53,11 +53,11 @@ function Home() {
     </p>
 
     <div className="flex justify-center gap-6">
-      <button className="bg-white text-blue-800 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition">
+      <button className="bg-white text-blue-800 font-semibold px-6 py-3 rounded-lg hover:bg-gray-300 transition">
         Explore Articles
       </button>
 
-      <button className="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition">
+      <button className="bg-blue-500  px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition">
         Become Reporter
       </button>
     </div>
@@ -68,7 +68,7 @@ function Home() {
 
 
 
-     <div className="max-w-7xl mx-auto px-8 py-20">
+<div className="max-w-7xl -mt-16  mx-auto px-8 py-20">
   <h2 className="text-3xl font-bold mb-12 text-gray-800">
     Trending Articles
   </h2>

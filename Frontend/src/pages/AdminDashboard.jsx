@@ -71,7 +71,7 @@ function AdminDashboard() {
           <tr key={user.id} className="border-b">
             <td className="py-4">{user.name}</td>
             <td>{user.email}</td>
-            <td className="flex gap-3">
+            <td className="flex mt-3 gap-3">
               <button
                 onClick={() => approveReporter(user.id)}
                 className="bg-green-500 text-white px-3 py-1 rounded-full"

@@ -6,6 +6,7 @@ import ReporterDashboard from "./pages/ReporterDashboard";
 import Navbar from "./components/Navbar";
 import AdminDashboard from "./pages/AdminDashboard";
 import { Navigate } from "react-router-dom";  
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -15,15 +16,9 @@ function App() {
   <Route path="/" element={<Home/>}/>
   <Route path="/reporter/:id" element={<ReporterProfile/>}/>
   <Route path="/login" element={<Login/>}/>
+  <Route path="/register" element={<Register/>}/>
   <Route path="/dashboard" element={<ReporterDashboard />} />
-  <Route
-  path="/admin"
-  element={
-    localStorage.getItem("role") === "ADMIN"
-      ? <AdminDashboard />
-      : <Navigate to="/" />
-  }
-/>
+  <Route path="/admin" element={<AdminDashboard />} />
   </Routes>
   </>
   )

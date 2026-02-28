@@ -26,6 +26,27 @@ function Home() {
     r => r.averageRating < 3 && r.totalRatings > 0
   );
 
+  const handleBecomeReporter = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
+  try {
+    await api.put("/users/request-reporter", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    alert("Request sent successfully! Admin will review.");
+  } catch (err) {
+    alert("You may have already requested or are already a reporter.");
+  }
+};
+
   return (
     <div >
 
@@ -57,44 +78,20 @@ function Home() {
         Explore Articles
       </button>
 
-      <button className="bg-blue-500  px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition">
-        Become Reporter
-      </button>
+    
+      
+      <button
+  onClick={handleBecomeReporter}
+  className="bg-blue-500  px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
+>
+  Become Reporter
+</button>
     </div>
 
   </div>
 </div>
 
-
-
-
-<div className="max-w-7xl -mt-16  mx-auto px-8 py-20">
-  <h2 className="text-3xl font-bold mb-12 text-gray-800">
-    Trending Articles
-  </h2>
-
-  <div className="grid md:grid-cols-3 gap-10">
-    {articles.map(article => (
-      <div
-        key={article.id}
-        className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-2 hover:shadow-xl transition duration-300"
-      >
-        <h3 className="text-lg font-semibold mb-2">
-          {article.title}
-        </h3>
-
-        <p className="text-gray-500 text-sm line-clamp-3 mb-4">
-          {article.content}
-        </p>
-
-        <p className="text-sm text-gray-400">
-          By {article.reporterName || "Reporter"}
-        </p>
-      </div>
-    ))}
-  </div>
-</div>
-      <div className="bg-[#F1F5F9] py-20">
+<div className="-mt-16 py-20">
   <div className="max-w-7xl mx-auto px-8">
     <h2 className="text-3xl font-bold mb-12">
       Top Reporters
@@ -124,6 +121,35 @@ function Home() {
     </div>
   </div>
 </div>
+
+
+<div className="max-w-7xl -mt-28  mx-auto px-8 py-20">
+  <h2 className="text-3xl font-bold mb-12 text-gray-800">
+    Trending Articles
+  </h2>
+
+  <div className="grid md:grid-cols-3 gap-10">
+    {articles.map(article => (
+      <div
+        key={article.id}
+        className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-2 hover:shadow-xl transition duration-300"
+      >
+        <h3 className="text-lg font-semibold mb-2">
+          {article.title}
+        </h3>
+
+        <p className="text-gray-500 text-sm line-clamp-3 mb-4">
+          {article.content}
+        </p>
+
+        <p className="text-sm text-gray-400">
+          By {article.reporterName || "Reporter"}
+        </p>
+      </div>
+    ))}
+  </div>
+</div>
+      
     </div>
   );
 }

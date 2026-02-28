@@ -58,50 +58,28 @@ export default function ReporterDashboard() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Reporter Dashboard</h1>
+      <div className="grid md:grid-cols-3 gap-6 mb-10">
+  <div className="bg-white p-6 rounded-2xl shadow-md">
+    <h4 className="text-gray-500">Average Rating</h4>
+    <p className="text-3xl font-bold text-blue-600">
+      {data.averageRating}
+    </p>
+  </div>
 
+  <div className="bg-white p-6 rounded-2xl shadow-md">
+    <h4 className="text-gray-500">Total Ratings</h4>
+    <p className="text-3xl font-bold">
+      {data.totalRatings}
+    </p>
+  </div>
 
-      <h2>Welcome, {data.name}</h2>
-
-      <p>⭐ Average Rating: {data.averageRating}</p>
-      <p>📊 Total Ratings: {data.totalRatings}</p>
-
-      <h3>My Articles</h3>
-      <h3>Create New Article</h3>
-
-<input
-  type="text"
-  placeholder="Title"
-  value={title}
-  onChange={(e) => setTitle(e.target.value)}
-  style={{ display: "block", marginBottom: "10px", width: "300px" }}
-/>
-
-<textarea
-  placeholder="Content"
-  value={content}
-  onChange={(e) => setContent(e.target.value)}
-  style={{ display: "block", marginBottom: "10px", width: "300px", height: "100px" }}
-/>
-
-<button onClick={handleCreateArticle}>Submit Article</button>
-
-      {data.myArticles.length === 0 ? (
-        <p>No articles yet.</p>
-      ) : (
-        <ul>
-          {data.myArticles.map(article => (
-            <li key={article.id}>
-              <strong>{article.title}</strong>
-              <br />
-              Status: {article.status}
-              <br />
-              Created: {new Date(article.createdAt).toLocaleString()}
-              <hr />
-            </li>
-          ))}
-        </ul>
-      )}
+  <div className="bg-white p-6 rounded-2xl shadow-md">
+    <h4 className="text-gray-500">Total Articles</h4>
+    <p className="text-3xl font-bold">
+      {data.myArticles.length}
+    </p>
+  </div>
+</div>
     </div>
   );
 }

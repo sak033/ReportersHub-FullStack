@@ -52,26 +52,42 @@ function AdminDashboard() {
 
   return (
     <div>
-      <h2>Admin Dashboard</h2>
+      <div className="max-w-6xl mx-auto px-6 py-16">
+  <h2 className="text-3xl font-bold mb-8">Admin Dashboard</h2>
 
-      <h3>Pending Articles</h3>
-      {pendingArticles.map(article => (
-        <div key={article.id} style={{ border: "1px solid gray", margin: "10px", padding: "10px" }}>
-          <h4>{article.title}</h4>
-          <p>{article.content}</p>
+  <div className="bg-white rounded-2xl shadow-md p-8 mb-12">
+    <h3 className="text-xl font-semibold mb-6">Reporter Requests</h3>
 
-          <button onClick={() => approveArticle(article.id)}>Approve</button>
-          <button onClick={() => rejectArticle(article.id)}>Reject</button>
-        </div>
-      ))}
-
-      <h3>Reporter Requests</h3>
-      {reporterRequests.map(user => (
-        <div key={user.id} style={{ border: "1px solid gray", margin: "10px", padding: "10px" }}>
-          <p>{user.name} ({user.email})</p>
-          <button onClick={() => approveReporter(user.id)}>Approve Reporter</button>
-        </div>
-      ))}
+    <table className="w-full text-left">
+      <thead>
+        <tr className="border-b text-gray-500">
+          <th className="py-3">Name</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {reporterRequests.map(user => (
+          <tr key={user.id} className="border-b">
+            <td className="py-4">{user.name}</td>
+            <td>{user.email}</td>
+            <td className="flex gap-3">
+              <button
+                onClick={() => approveReporter(user.id)}
+                className="bg-green-500 text-white px-3 py-1 rounded-full"
+              >
+                Approve
+              </button>
+              <button className="bg-red-500 text-white px-3 py-1 rounded-full">
+                Reject
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
 
     </div>
   );

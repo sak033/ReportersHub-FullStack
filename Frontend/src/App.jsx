@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import AdminDashboard from "./pages/AdminDashboard";
 import { Navigate } from "react-router-dom";  
 import Register from "./pages/Register";
+import CreateArticle from "./pages/CreateArticle";  
 
 function App() {
   return (
@@ -14,10 +15,12 @@ function App() {
   <Navbar />
   <Routes>
   <Route path="/" element={<Home/>}/>
+  <Route path="/create-article" element={<CreateArticle />} />  
   <Route path="/reporter/:id" element={<ReporterProfile/>}/>
   <Route path="/login" element={<Login/>}/>
   <Route path="/register" element={<Register/>}/>
   <Route path="/dashboard" element={<ReporterDashboard />} />
+  
   <Route path="/admin" element={<AdminDashboard />} />
   </Routes>
   </>

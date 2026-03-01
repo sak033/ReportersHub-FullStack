@@ -134,6 +134,25 @@ function Home() {
         key={article.id}
         className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-2 hover:shadow-xl transition duration-300"
       >
+
+        {/* IMAGE */}
+  {article.imageUrl && (
+    <img
+      src={`http://localhost:8080${article.imageUrl}`}
+      alt="Article"
+      className="rounded-lg mb-4 w-full h-48 object-cover"
+    />
+  )}
+
+  {/* VIDEO */}
+  {article.videoUrl && (
+    <iframe
+      className="w-full mb-4 rounded-lg"
+      height="200"
+      src={article.videoUrl.replace("watch?v=", "embed/")}
+      allowFullScreen
+    />
+  )}
         <h3 className="text-lg font-semibold mb-2">
           {article.title}
         </h3>

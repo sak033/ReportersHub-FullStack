@@ -23,8 +23,8 @@ function Navbar() {
           
           {/* Logo Section */}
           <div className="flex items-center gap-3">
-            <img src={Logo} alt="logo" className="h-10 w-auto" />
-            <Link to="/" className="text-xl font-bold text-white">
+            <img src={Logo} alt="logo" className="h-16 -ml-10 w-auto" />
+            <Link to="/" className="text-xl -ml-8 font-bold text-white">
               ReportersHub
             </Link>
           </div>

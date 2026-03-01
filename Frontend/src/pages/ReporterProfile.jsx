@@ -46,7 +46,7 @@ function ReporterProfile() {
       {message && <p style={{ color: "green" }}>{message}</p>}
 
       <h2>Approved Articles</h2>
-      {reporter.approvedArticles.map(article => (
+      {reporter.approvedArticles && reporter.approvedArticles.map(article => (
         <div
           key={article.id}
           style={{ border: "1px solid gray", margin: "10px", padding: "10px" }}

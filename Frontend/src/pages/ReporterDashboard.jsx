@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function ReporterDashboard() {
   const [data, setData] = useState(null);
@@ -9,23 +10,42 @@ export default function ReporterDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [image, setImage] = useState(null);
 const [videoUrl, setVideoUrl] = useState("");
+const [rank, setRank] = useState(null);
+
+const navigate =useNavigate();
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/reporters/dashboard", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => {
-        setData(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+  // Fetch dashboard data
+  axios
+    .get("http://localhost:8080/reporters/dashboard", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      setData(res.data);
+      setLoading(false);
+
+      // AFTER getting dashboard data, fetch ranking
+      return axios.get("http://localhost:8080/reporters/top");
+    })
+    .then(res => {
+      const reporters = res.data;
+
+      // Find current reporter position
+      const index = reporters.findIndex(
+        r => r.id === data?.id || r.name === data?.name
+      );
+
+      if (index !== -1) {
+        setRank(index + 1);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+}, []);
 
   const handleCreateArticle = async () => {
     console.log("Submit clicked");
@@ -87,20 +107,76 @@ const [videoUrl, setVideoUrl] = useState("");
 
   return (
     
-    <div className="min-h-screen bg-gray-50 py-16 px-6">
+    <div className="min-h-screen bg-gray-50 py-10 sm:py-16 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto space-y-16">
+<div className="flex flex-col lg:flex-row gap-10">
+  <div className="bg-white rounded-2xl shadow-md p-6 sm:p-8 max-w-3xl mx-auto">
+  
+  <div className=" sm:flex-row items-center sm:items-start gap-6">
 
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">
-            Welcome, {data.name}
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Manage your articles and track your performance.
-          </p>
-        </div>
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+<div>
+    {/* Profile Image */}
+    <img
+      src="https://i.pravatar.cc/150"
+      alt="Profile"
+      className="w-28 h-28 rounded-full object-cover border-4 border-blue-100"
+    />
+  </div>
 
-        {/* Stats Section */}
+    <div className="mt-3">
+      {/* Name */}
+      <h2 className="text-2xl font-bold text-gray-800">
+        {data.name}
+      </h2>
+
+      {/* Rating */}
+     <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
+  
+  {/* Dynamic Stars */}
+  <div className="flex text-yellow-400 text-lg">
+    {Array.from({ length: 5 }).map((_, index) => (
+      <span key={index}>
+        {index < Math.round(data.averageRating || 0) ? "★" : "☆"}
+      </span>
+    ))}
+  </div>
+
+  {/* Dynamic Rating Numbers */}
+  <span className="text-gray-500 text-sm">
+    ({data.averageRating?.toFixed(1) || 0} • {data.totalRatings || 0} reviews)
+  </span>
+
+</div>
+      {rank && (
+  <p className="text-sm text-blue-600 mt-2 font-medium">
+    Rank #{rank} Top Reporter
+  </p>
+)}
+    </div>
+
+    </div>
+
+
+    {/* Info Section */}
+    <div className="flex-1 text-center sm:text-left mt-6 sm:mt-0">
+
+     {/* About */}
+      <p className="text-gray-600 mt-4  text-sm sm:text-base leading-relaxed">
+        Passionate reporter covering technology, health, and global news.
+        Dedicated to delivering accurate and impactful journalism.
+      </p>
+
+      {/* Edit Button */}
+      <button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
+        Edit Profile
+      </button>
+
+    </div>
+  </div>
+</div>
+        
+{/* Stats Section */}
 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
   {/* Average Rating */}
@@ -127,7 +203,12 @@ const [videoUrl, setVideoUrl] = useState("");
     </h2>
   </div>
 
-  {/* Go Live Action Box */}
+</div>
+
+</div>
+
+<div className="flex flex-col sm:flex-row gap-4">
+{/* Go Live Action Box */}
  <div
   className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-xl shadow-sm cursor-pointer hover:scale-[1.02] transition"
 >
@@ -142,54 +223,15 @@ const [videoUrl, setVideoUrl] = useState("");
   </div>
 </div>
 
+<div
+  onClick={() => navigate("/create-article")}
+  className="bg-white border-2 border-dashed border-blue-400 p-4 rounded-xl shadow-sm cursor-pointer hover:scale-[1.03] hover:bg-blue-50 transition flex flex-col items-center justify-center"
+>
+  <span className="text-3xl text-blue-600 font-bold">+</span>
+  <p className="text-sm mt-2 text-gray-600">Create Article</p>
 </div>
-
-        {/* Create Article Section */}
-        <div className="bg-white rounded-2xl shadow-md p-10 space-y-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Create New Article
-          </h2>
-
-          <input
-            type="text"
-            placeholder="Article Title"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-
-          <textarea
-            placeholder="Write your article content..."
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 h-32 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-
-          {/* Image Upload */}
-<input
-  type="file"
-  accept="image/*"
-  onChange={(e) => setImage(e.target.files[0])}
-  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-/>
-
-{/* YouTube Video URL */}
-<input
-  type="text"
-  placeholder="YouTube Video URL (optional)"
-  value={videoUrl}
-  onChange={(e) => setVideoUrl(e.target.value)}
-  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-/>
-
-          <button
-            onClick={handleCreateArticle}
-            disabled={submitting}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {submitting ? "Submitting..." : "Submit Article"}
-          </button>
-        </div>
+</div>
+        
 
         {/* My Articles Section */}
         <div>
@@ -200,7 +242,7 @@ const [videoUrl, setVideoUrl] = useState("");
           {data.myArticles.length === 0 ? (
             <p className="text-gray-500">You haven't written any articles yet.</p>
           ) : (
-            <div className="grid md:grid-cols-2 gap-8">
+           <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
               {data.myArticles.map(article => (
                 <div
                   key={article.id}

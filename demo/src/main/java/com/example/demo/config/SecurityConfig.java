@@ -16,6 +16,9 @@ import com.example.demo.security.JwtService;
 import com.example.demo.security.JwtAuthenticationFilter;
 import com.example.demo.repository.UserRepository;
 
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import org.springframework.http.HttpMethod;
 
 @EnableMethodSecurity
@@ -40,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/articles/public/**").permitAll()
                         .requestMatchers("/reporters/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
@@ -55,9 +59,21 @@ public class SecurityConfig {
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
+    }
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                registry
+                        .addResourceHandler("/uploads/**")
+                        .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/");
+            }
+        };
     }
 }

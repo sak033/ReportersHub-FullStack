@@ -87,6 +87,45 @@ function AdminDashboard() {
       </tbody>
     </table>
   </div>
+  <div className="bg-white rounded-2xl shadow-md p-8 mb-12">
+  <h3 className="text-xl font-semibold mb-6">Pending Articles</h3>
+
+  {pendingArticles.length === 0 ? (
+    <p className="text-gray-500">No pending articles.</p>
+  ) : (
+    <table className="w-full text-left">
+      <thead>
+        <tr className="border-b text-gray-500">
+          <th className="py-3">Title</th>
+          <th>Content</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {pendingArticles.map(article => (
+          <tr key={article.id} className="border-b">
+            <td className="py-4 font-semibold">{article.title}</td>
+            <td>{article.content}</td>
+            <td className="flex gap-3 mt-3">
+              <button
+                onClick={() => approveArticle(article.id)}
+                className="bg-green-500 text-white px-3 py-1 rounded-full"
+              >
+                Approve
+              </button>
+              <button
+                onClick={() => rejectArticle(article.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded-full"
+              >
+                Reject
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
 </div>
 
     </div>

@@ -6,6 +6,12 @@ import com.example.demo.repository.UserRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,23 +29,53 @@ public class ArticleController {
         this.userRepository = userRepository;
     }
 
-    @PreAuthorize("hasRole('REPORTER')")
-    @PostMapping
-    public Article createArticle(@RequestBody Article article,
-                                 Authentication authentication) {
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Article createArticle(
+            @RequestParam String title,
+            @RequestParam String content,
+            @RequestParam(required = false) MultipartFile image,
+            @RequestParam(required = false) String videoUrl,
+            Authentication authentication
+    ) throws IOException {
 
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Article article = new Article();
+        article.setTitle(title);
+        article.setContent(content);
         article.setCreatedBy(user);
         article.setStatus(ArticleStatus.PENDING);
         article.setCreatedAt(LocalDateTime.now());
 
+        // ✅ IMAGE SAVE (only once)
+        if (image != null && !image.isEmpty()) {
+
+            String uploadDir = System.getProperty("user.dir") + "/uploads/";
+
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+
+            Files.write(filePath, image.getBytes());
+
+            article.setImageUrl("/uploads/" + fileName);
+        }
+
+        // ✅ VIDEO SAVE
+        if (videoUrl != null && !videoUrl.isBlank()) {
+            article.setVideoUrl(videoUrl);
+        }
+
         return articleRepository.save(article);
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/approve/{id}")
     public String approveArticle(@PathVariable Long id) {

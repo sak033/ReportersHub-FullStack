@@ -28,5 +28,11 @@ public class Article {
 
     private LocalDateTime createdAt;
 
+    @Column(length = 500)
+    private String imageUrl;
+
+    @Column(length = 500)
+    private String videoUrl;
+
     // getters and setters
 }

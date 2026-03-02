@@ -27,6 +27,7 @@ public class User {
     private Role role = Role.USER;
     private LocalDateTime createdAt = LocalDateTime.now();
     private ReporterStatus reporterStatus;
+    private String profileImageUrl;
 
 
 }

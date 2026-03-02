@@ -16,6 +16,24 @@ const navigate =useNavigate();
 
   const token = localStorage.getItem("token");
 
+  const handleProfileImageUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  await axios.post(
+    "http://localhost:8080/users/profile-image",
+    formData,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+
+  window.location.reload(); // simple refresh
+};
+
   useEffect(() => {
   // Fetch dashboard data
   axios
@@ -118,10 +136,18 @@ const navigate =useNavigate();
 <div>
     {/* Profile Image */}
     <img
-      src="https://i.pravatar.cc/150"
-      alt="Profile"
-      className="w-28 h-28 rounded-full object-cover border-4 border-blue-100"
-    />
+  src={
+    data.profileImageUrl
+      ? `http://localhost:8080${data.profileImageUrl}`
+      : "https://i.pravatar.cc/150"
+  }
+  alt="Profile"
+  className="w-28 h-28 rounded-full object-cover border-4 border-blue-100"
+/>
+<input
+  type="file"
+  onChange={handleProfileImageUpload}
+/>
   </div>
 
     <div className="mt-3">
@@ -176,13 +202,14 @@ const navigate =useNavigate();
   </div>
 </div>
         
-{/* Stats Section */}
-<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div className="bg-blue-900 rounded-xl p-6 sm:p-8 ">
+  {/* Stats Section */}
+<div className="grid grid-cols-2 md:grid-cols-4 gap-5">
 
   {/* Average Rating */}
   <div className="bg-white p-4 rounded-xl shadow-sm">
     <p className="text-xs text-gray-500">Average Rating</p>
-    <h2 className="text-2xl font-bold text-blue-600 mt-1">
+    <h2 className="text-2xl font-bold  mt-1">
       {data.averageRating}
     </h2>
   </div>
@@ -204,10 +231,7 @@ const navigate =useNavigate();
   </div>
 
 </div>
-
-</div>
-
-<div className="flex flex-col sm:flex-row gap-4">
+<div className="flex flex-col mt-4 sm:flex-row gap-4">
 {/* Go Live Action Box */}
  <div
   className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-xl shadow-sm cursor-pointer hover:scale-[1.02] transition"
@@ -231,6 +255,10 @@ const navigate =useNavigate();
   <p className="text-sm mt-2 text-gray-600">Create Article</p>
 </div>
 </div>
+</div>
+</div>
+
+
         
 
         {/* My Articles Section */}

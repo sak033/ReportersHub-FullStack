@@ -99,11 +99,20 @@ function Home() {
 
     <div className="flex gap-8 overflow-x-auto pb-4">
       {reporters.map(r => (
-        <div
+        <Link
           key={r.id}
+          to={`/reporter/${r.id}`}
           className="bg-white w-56 rounded-2xl shadow-md p-6 text-center flex-shrink-0"
         >
-          <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4"></div>
+          <img
+  src={
+    r.profileImageUrl
+      ? `http://localhost:8080${r.profileImageUrl}`
+      : "https://i.pravatar.cc/200"
+  }
+  alt="Reporter"
+  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-blue-100"
+/>
 
           <h3 className="font-semibold">
             {r.name}
@@ -116,7 +125,7 @@ function Home() {
           <p className="text-gray-400 text-sm">
             {r.totalRatings} Ratings
           </p>
-        </div>
+        </Link>
       ))}
     </div>
   </div>

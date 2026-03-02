@@ -57,8 +57,11 @@ public class ReporterController {
                 .map(a -> new ArticleSummaryDTO(
                         a.getId(),
                         a.getTitle(),
+                        a.getContent(),        // 🔥 added
                         a.getCreatedAt(),
-                        a.getStatus().name()
+                        a.getStatus().name(),
+                        a.getImageUrl(),       // 🔥 added
+                        a.getVideoUrl()        // 🔥 added
                 ))
                 .toList();
 
@@ -70,7 +73,8 @@ public class ReporterController {
                 user.getId(),
                 user.getName(),
                 averageRating != null ? averageRating : 0.0,
-                articleDTOs
+                articleDTOs,
+                user.getProfileImageUrl()
         );
     }
 
@@ -132,7 +136,8 @@ public class ReporterController {
                             reporter.getId(),
                             reporter.getName(),
                             avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0,
-                            total != null ? total : 0L
+                            total != null ? total : 0L,
+                            reporter.getProfileImageUrl()
                     );
                 })
                 .sorted((r1, r2) ->
@@ -157,8 +162,11 @@ public class ReporterController {
                 .map(a -> new ArticleSummaryDTO(
                         a.getId(),
                         a.getTitle(),
+                        a.getContent(),        // add this
                         a.getCreatedAt(),
-                        a.getStatus().name()
+                        a.getStatus().name(),
+                        a.getImageUrl(),       // add this
+                        a.getVideoUrl()        // add this
                 ))
                 .toList();
 
@@ -172,7 +180,9 @@ public class ReporterController {
                 reporter.getName(),
                 avgRating != null ? avgRating : 0.0,
                 totalRatings != null ? totalRatings : 0L,
-                articleDTOs
+                articleDTOs,
+                reporter.getProfileImageUrl()
+
         );
     }
 }

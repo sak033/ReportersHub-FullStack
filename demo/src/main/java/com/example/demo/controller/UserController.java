@@ -6,9 +6,16 @@ import com.example.demo.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import com.example.demo.model.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.StandardCopyOption;
 
 
 @RestController
@@ -131,5 +138,29 @@ public class UserController {
     @GetMapping("/reporter-requests")
     public List<User> getReporterRequests() {
         return userRepository.findByReporterStatus(ReporterStatus.PENDING);
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/profile-image")
+    public String uploadProfileImage(
+            @RequestParam("image") MultipartFile file,
+            Authentication authentication) throws IOException {
+
+        User user = userRepository
+                .findByEmail(authentication.getName())
+                .orElseThrow();
+
+        String uploadDir = System.getProperty("user.dir") + "/uploads/";
+
+        String fileName = "profile_" + user.getId() + "_" + file.getOriginalFilename();
+
+        Path filePath = Paths.get(uploadDir, fileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        user.setProfileImageUrl("/uploads/" + fileName);
+        userRepository.save(user);
+
+        return "Profile image uploaded successfully.";
     }
 }

@@ -43,26 +43,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String token = authHeader.substring(7);
 
-            if (jwtService.validateToken(token)) {
+            try {
+                if (jwtService.validateToken(token)) {
 
-                String email = jwtService.extractUsername(token);
+                    String email = jwtService.extractUsername(token);
 
-                User user = userRepository.findByEmail(email).orElseThrow();
+                    userRepository.findByEmail(email).ifPresent(user -> {
 
-                List<SimpleGrantedAuthority> authorities =
-                        List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+                        List<SimpleGrantedAuthority> authorities =
+                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                authorities
-                        );
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        email,
+                                        null,
+                                        authorities
+                                );
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    });
+                }
+            } catch (Exception e) {
+                // 🔥 IMPORTANT:
+                // If token invalid or expired → do nothing
+                // Let public endpoints work normally
             }
         }
-
         // ALWAYS continue filter chain
         filterChain.doFilter(request, response);
     }

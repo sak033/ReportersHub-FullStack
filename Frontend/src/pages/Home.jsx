@@ -6,8 +6,18 @@ import Banner from "../assets/Banner.png";
 function Home() {
   const [articles, setArticles] = useState([]);
   const [reporters, setReporters] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+  if (token) {
+    api.get("/users/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => setCurrentUser(res.data))
+    .catch(() => {});
+  }
     // Fetch approved articles
     api.get("/articles/public")
       .then(res => setArticles(res.data))
@@ -80,12 +90,28 @@ function Home() {
 
     
       
-      <button
-  onClick={handleBecomeReporter}
-  className="bg-blue-500  px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
->
-  Become Reporter
-</button>
+      {!currentUser ? (
+  <button
+    onClick={() => navigate("/login")}
+    className="bg-blue-500 px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
+  >
+    Become Reporter
+  </button>
+) : currentUser.role === "REPORTER" ? (
+  <button
+    disabled
+    className="bg-gray-400 px-6 py-3 rounded-lg cursor-not-allowed"
+  >
+    You are a Reporter
+  </button>
+) : (
+  <button
+    onClick={handleBecomeReporter}
+    className="bg-blue-500 px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
+  >
+    Become Reporter
+  </button>
+)}
     </div>
 
   </div>

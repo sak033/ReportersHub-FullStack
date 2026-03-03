@@ -163,4 +163,36 @@ public class UserController {
 
         return "Profile image uploaded successfully.";
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/update-profile")
+    public String updateProfile(
+            @RequestParam String name,
+            @RequestParam String about,
+            @RequestParam(required = false) MultipartFile image,
+            Authentication authentication
+    ) throws IOException {
+
+        User user = userRepository
+                .findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setName(name);
+        user.setAbout(about);
+
+        if (image != null && !image.isEmpty()) {
+
+            String uploadDir = System.getProperty("user.dir") + "/uploads/";
+            String fileName = "profile_" + user.getId() + "_" + image.getOriginalFilename();
+
+            Path filePath = Paths.get(uploadDir, fileName);
+            Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            user.setProfileImageUrl("/uploads/" + fileName);
+        }
+
+        userRepository.save(user);
+
+        return "Profile updated successfully";
+    }
 }

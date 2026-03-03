@@ -10,17 +10,19 @@ public class ReporterDashboardDTO {
     private List<ArticleSummaryDTO> myArticles;
 
     private String profileImageUrl;
+    private String about;
 
     public ReporterDashboardDTO(String name,
                                 Double averageRating,
                                 Long totalRatings,
                                 List<ArticleSummaryDTO> myArticles,
-                                String profileImageUrl) {
+                                String profileImageUrl, String about) {
         this.name = name;
         this.averageRating = averageRating;
         this.totalRatings = totalRatings;
         this.myArticles = myArticles;
         this.profileImageUrl= profileImageUrl;
+        this.about=about;
     }
 
     public String getName() { return name; }
@@ -29,4 +31,5 @@ public class ReporterDashboardDTO {
     public List<ArticleSummaryDTO> getMyArticles() { return myArticles; }
 
     public String getProfileImageUrl(){ return profileImageUrl;}
+    public String getAbout(){return about;}
 }

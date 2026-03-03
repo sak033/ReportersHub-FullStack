@@ -7,7 +7,9 @@ import Navbar from "./components/Navbar";
 import AdminDashboard from "./pages/AdminDashboard";
 import { Navigate } from "react-router-dom";  
 import Register from "./pages/Register";
-import CreateArticle from "./pages/CreateArticle";  
+import CreateArticle from "./pages/CreateArticle"; 
+import ArticleDetails from "./pages/ArticleDetails";
+import EditArticle from "./pages/EditArticle.jsx"; 
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
   <Route path="/dashboard" element={<ReporterDashboard />} />
   
   <Route path="/admin" element={<AdminDashboard />} />
+  <Route path="/article/:id" element={<ArticleDetails />} />
+<Route path="/edit-article/:id" element={<EditArticle />} />
   </Routes>
   </>
   )

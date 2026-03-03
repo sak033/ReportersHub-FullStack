@@ -110,4 +110,54 @@ public class ArticleController {
     public List<Article> getPendingArticles() {
         return articleRepository.findByStatus(ArticleStatus.PENDING);
     }
+    @GetMapping("/{id}")
+    public Article getArticleById(@PathVariable Long id) {
+
+        return articleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Article not found"));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/{id}")
+    public Article updateArticle(
+            @PathVariable Long id,
+            @RequestBody Article updatedArticle,
+            Authentication authentication
+    ) {
+
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Article not found"));
+
+        // ✅ Only creator can edit
+        if (!article.getCreatedBy().getEmail().equals(authentication.getName())) {
+            throw new RuntimeException("You cannot edit this article");
+        }
+
+        // ✅ Update content
+        article.setTitle(updatedArticle.getTitle());
+        article.setContent(updatedArticle.getContent());
+
+        // 🔁 IMPORTANT: Always move back to PENDING after edit
+        article.setStatus(ArticleStatus.PENDING);
+
+        return articleRepository.save(article);
+    }
+
+
+    @DeleteMapping("/{id}")
+    public String deleteArticle(@PathVariable Long id, Authentication authentication) {
+
+        String email = authentication.getName();
+
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Article not found"));
+
+        if (!article.getCreatedBy().getEmail().equals(email)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        articleRepository.delete(article);   // 🔥 CHANGE THIS LINE
+
+        return "Article deleted successfully.";
+    }
 }

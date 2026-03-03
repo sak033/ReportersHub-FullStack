@@ -35,11 +35,14 @@ function ReporterProfile() {
 
           {/* Avatar */}
           <img
-            src="https://i.pravatar.cc/200"
-            alt="Reporter"
-            className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
-          />
-
+  src={
+    reporter.profileImageUrl
+      ? `http://localhost:8080${reporter.profileImageUrl}`
+      : "https://i.pravatar.cc/200"
+  }
+  alt="Reporter"
+  className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+/>
           {/* Info */}
           <div className="flex-1 text-center md:text-left">
 

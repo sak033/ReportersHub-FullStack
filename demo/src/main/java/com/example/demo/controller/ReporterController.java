@@ -14,6 +14,7 @@ import com.example.demo.repository.RatingRepository;
 import com.example.demo.dto.TopReporterDTO;
 import com.example.demo.dto.ReporterDashboardDTO;
 
+
 import java.util.List;
 import java.util.Optional;
 
@@ -155,8 +156,12 @@ public class ReporterController {
                 .orElseThrow();
 
         // Get all articles (all statuses)
+        // Get all articles except DELETED
         List<Article> articles =
-                articleRepository.findByCreatedById(reporter.getId());
+                articleRepository.findByCreatedByIdAndStatusNot(
+                        reporter.getId(),
+                        ArticleStatus.DELETED
+                );
 
         List<ArticleSummaryDTO> articleDTOs = articles.stream()
                 .map(a -> new ArticleSummaryDTO(
@@ -181,7 +186,8 @@ public class ReporterController {
                 avgRating != null ? avgRating : 0.0,
                 totalRatings != null ? totalRatings : 0L,
                 articleDTOs,
-                reporter.getProfileImageUrl()
+                reporter.getProfileImageUrl(),
+                reporter.getAbout()
 
         );
     }

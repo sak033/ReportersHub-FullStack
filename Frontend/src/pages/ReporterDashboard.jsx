@@ -11,29 +11,17 @@ export default function ReporterDashboard() {
   const [image, setImage] = useState(null);
 const [videoUrl, setVideoUrl] = useState("");
 const [rank, setRank] = useState(null);
+const [showEditModal, setShowEditModal] = useState(false);
+const [editName, setEditName] = useState("");
+const [editAbout, setEditAbout] = useState("");
+const [editImage, setEditImage] = useState(null);
+const [openMenuId, setOpenMenuId] = useState(null);
 
 const navigate =useNavigate();
 
   const token = localStorage.getItem("token");
 
-  const handleProfileImageUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const formData = new FormData();
-  formData.append("image", file);
-
-  await axios.post(
-    "http://localhost:8080/users/profile-image",
-    formData,
-    {
-      headers: { Authorization: `Bearer ${token}` }
-    }
-  );
-
-  window.location.reload(); // simple refresh
-};
-
+  
   useEffect(() => {
   // Fetch dashboard data
   axios
@@ -43,6 +31,8 @@ const navigate =useNavigate();
     .then(res => {
       setData(res.data);
       setLoading(false);
+      setEditName(res.data.name);
+      setEditAbout(res.data.about || "");
 
       // AFTER getting dashboard data, fetch ranking
       return axios.get("http://localhost:8080/reporters/top");
@@ -123,12 +113,70 @@ const navigate =useNavigate();
       </div>
     );
 
+
+    const handleSaveProfile = async () => {
+  try {
+    const formData = new FormData();
+    formData.append("name", editName);
+    formData.append("about", editAbout);
+    if (editImage) formData.append("image", editImage);
+
+    await axios.put(
+      "http://localhost:8080/users/update-profile",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    setShowEditModal(false);
+    window.location.reload();
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleDelete = async (articleId) => {
+  try {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this article?"
+    );
+
+    if (!confirmDelete) return;
+
+
+    console.log("TOKEN:", token);
+    await axios.delete(
+      `http://localhost:8080/articles/${articleId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    // ✅ Remove deleted article from UI immediately
+    setData(prev => ({
+      ...prev,
+      myArticles: prev.myArticles.filter(a => a.id !== articleId)
+    }));
+
+    setOpenMenuId(null);
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
   return (
     
     <div className="min-h-screen bg-gray-50 py-10 sm:py-16 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto space-y-16">
-<div className="flex flex-col lg:flex-row gap-10">
-  <div className="bg-white rounded-2xl shadow-md p-6 sm:p-8 max-w-3xl mx-auto">
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+  <div className="bg-white rounded-2xl shadow-md p-6 sm:p-8 h-full">
   
   <div className=" sm:flex-row items-center sm:items-start gap-6">
 
@@ -144,10 +192,7 @@ const navigate =useNavigate();
   alt="Profile"
   className="w-28 h-28 rounded-full object-cover border-4 border-blue-100"
 />
-<input
-  type="file"
-  onChange={handleProfileImageUpload}
-/>
+
   </div>
 
     <div className="mt-3">
@@ -188,22 +233,24 @@ const navigate =useNavigate();
     <div className="flex-1 text-center sm:text-left mt-6 sm:mt-0">
 
      {/* About */}
-      <p className="text-gray-600 mt-4  text-sm sm:text-base leading-relaxed">
-        Passionate reporter covering technology, health, and global news.
-        Dedicated to delivering accurate and impactful journalism.
-      </p>
+      <p className={`mt-4 text-sm sm:text-base leading-relaxed min-h-[80px] ${
+  data.about ? "text-gray-600" : "text-gray-400 italic"
+}`}>
+  {data.about || "Add a short bio to tell people about yourself."}
+</p>
 
       {/* Edit Button */}
-      <button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
-        Edit Profile
-      </button>
-
+     <button
+  onClick={() => setShowEditModal(true)}
+  className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+>
+  Edit Profile
+</button>
     </div>
   </div>
 </div>
         
-<div className="bg-blue-900 rounded-xl p-6 sm:p-8 ">
-  {/* Stats Section */}
+<div className="bg-blue-900 rounded-xl p-6 sm:p-8 h-full">
 <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
 
   {/* Average Rating */}
@@ -263,63 +310,190 @@ const navigate =useNavigate();
 
         {/* My Articles Section */}
         <div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-8">
-            My Articles
-          </h2>
+          <div className="flex items-center justify-between mb-10">
+  <h2 className="text-3xl font-bold text-gray-900">
+    My Articles
+  </h2>
+
+  <span className="text-sm text-gray-500">
+    {data.myArticles.length} Articles
+  </span>
+</div>
 
           {data.myArticles.length === 0 ? (
             <p className="text-gray-500">You haven't written any articles yet.</p>
           ) : (
-           <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
-              {data.myArticles.map(article => (
-                <div
-                  key={article.id}
-                  className="bg-white p-6 rounded-2xl shadow-md"
-                >
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {article.title}
-                  </h3>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+  {data.myArticles.map(article => (
+    <div
+      key={article.id}
+      onClick={() => navigate(`/article/${article.id}`)}
+      className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 cursor-pointer"
+    >
 
-                  <p className="text-sm text-gray-500 mt-2">
-                    Created: {new Date(article.createdAt).toLocaleString()}
-                  </p>
+      {/* IMAGE */}
+      <div className="relative h-48 bg-gray-100 overflow-hidden">
+        {article.imageUrl ? (
+          <img
+            src={`http://localhost:8080${article.imageUrl}`}
+            alt="Article"
+            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+            No Image
+          </div>
+        )}
 
-                  <div className="mt-4">
-                    <span
-                      className={`px-4 py-1 rounded-full text-sm font-medium ${
-                        article.status === "APPROVED"
-                          ? "bg-green-100 text-green-600"
-                          : article.status === "PENDING"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
-                    >
-                      {article.status}
-                    </span>
-                  </div>
-                  {article.imageUrl && (
-  <img
-    src={`http://localhost:8080${article.imageUrl}`}
-    alt="Article"
-    className="rounded-lg mt-4"
-  />
-)}
+        {/* STATUS BADGE */}
+        <span
+          className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow ${
+            article.status === "APPROVED"
+              ? "bg-green-500 text-white"
+              : article.status === "PENDING"
+              ? "bg-yellow-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {article.status}
+        </span>
 
-{article.videoUrl && (
-  <iframe
-    className="w-full mt-4 rounded-lg"
-    height="250"
-    src={article.videoUrl.replace("watch?v=", "embed/")}
-    allowFullScreen
-  />
-)}
-                </div>
-              ))}
-            </div>
+        {/* 3 DOT MENU BUTTON */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenMenuId(openMenuId === article.id ? null : article.id);
+          }}
+          className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-full shadow hover:bg-white"
+        >
+          ⋮
+        </button>
+
+        {/* DROPDOWN MENU */}
+        {openMenuId === article.id && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute top-12 right-3 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20"
+          >
+            <button
+              onClick={() => navigate(`/edit-article/${article.id}`)}
+              className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={() => handleDelete(article.id)}
+              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* CONTENT */}
+      <div className="p-6">
+        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+          {article.title}
+        </h3>
+
+        <p className="text-sm text-gray-500 mt-2">
+          {new Date(article.createdAt).toLocaleDateString()}
+        </p>
+
+        <p className="text-gray-600 text-sm mt-4 line-clamp-3">
+          {article.content}
+        </p>
+      </div>
+
+    </div>
+  ))}
+</div>
           )}
         </div>
 
       </div>
+
+
+
+      {showEditModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white w-full max-w-md rounded-2xl p-6 space-y-5 shadow-xl">
+
+      <h2 className="text-xl font-semibold">Edit Profile</h2>
+
+      {/* Profile Image */}
+      <div className="text-center">
+  <p className="text-sm font-medium mb-3">Profile Image</p>
+
+  <label className="cursor-pointer block">
+    <img
+      src={
+        editImage
+          ? URL.createObjectURL(editImage)
+          : data.profileImageUrl
+          ? `http://localhost:8080${data.profileImageUrl}`
+          : "https://i.pravatar.cc/150"
+      }
+      alt="Edit Profile"
+      className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-blue-100 hover:opacity-80 transition"
+    />
+
+    {/* Hidden File Input */}
+    <input
+      type="file"
+      hidden
+      accept="image/*"
+      onChange={(e) => setEditImage(e.target.files[0])}
+    />
+  </label>
+
+  <p className="text-xs text-gray-500 mt-2">
+    Click image to change
+  </p>
+</div>
+
+      {/* Name */}
+      <div>
+        <label className="text-sm font-medium">Name</label>
+        <input
+          type="text"
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          className="mt-2 w-full border rounded-lg px-3 py-2"
+        />
+      </div>
+
+      {/* About */}
+      <div>
+        <label className="text-sm font-medium">About</label>
+        <textarea
+          value={editAbout}
+          onChange={(e) => setEditAbout(e.target.value)}
+          className="mt-2 w-full border rounded-lg px-3 py-2"
+        />
+      </div>
+
+      <div className="flex justify-end gap-3 pt-3">
+        <button
+          onClick={() => setShowEditModal(false)}
+          className="px-4 py-2 border rounded-lg"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleSaveProfile}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+        >
+          Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }

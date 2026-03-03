@@ -28,6 +28,9 @@ public class User {
     private LocalDateTime createdAt = LocalDateTime.now();
     private ReporterStatus reporterStatus;
     private String profileImageUrl;
+    @Column(length = 1000)
+    private String about;
+
 
 
 }

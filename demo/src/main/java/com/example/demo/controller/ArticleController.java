@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.model.*;
 import com.example.demo.repository.ArticleRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.ArticleLikeRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.IOException;
+import java.util.Optional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,11 +25,13 @@ public class ArticleController {
 
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
-
+    private final ArticleLikeRepository articleLikeRepository;
     public ArticleController(ArticleRepository articleRepository,
-                             UserRepository userRepository) {
+                             UserRepository userRepository,
+                             ArticleLikeRepository articleLikeRepository) {
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.articleLikeRepository=articleLikeRepository;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -159,5 +164,57 @@ public class ArticleController {
         articleRepository.delete(article);   // 🔥 CHANGE THIS LINE
 
         return "Article deleted successfully.";
+    }
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable Long id,
+                                        Authentication authentication) {
+
+        User user = userRepository
+                .findByEmail(authentication.getName())
+                .orElseThrow();
+
+        Article article = articleRepository
+                .findById(id)
+                .orElseThrow();
+
+        Optional<ArticleLike> existing =
+                articleLikeRepository.findByUserAndArticle(user, article);
+
+        if (existing.isPresent()) {
+
+            articleLikeRepository.delete(existing.get());
+            article.setLikes(article.getLikes() - 1);
+
+            articleRepository.save(article);
+
+            return ResponseEntity.ok("Unliked");
+
+        } else {
+
+            ArticleLike like = new ArticleLike();
+            like.setUser(user);
+            like.setArticle(article);
+
+            articleLikeRepository.save(like);
+
+            article.setLikes(article.getLikes() + 1);
+            articleRepository.save(article);
+
+            return ResponseEntity.ok("Liked");
+        }
+    }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<?> addView(@PathVariable Long id) {
+
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Article not found"));
+
+        article.setViews(article.getViews() + 1);
+
+        articleRepository.save(article);
+
+        return ResponseEntity.ok().build();
     }
 }

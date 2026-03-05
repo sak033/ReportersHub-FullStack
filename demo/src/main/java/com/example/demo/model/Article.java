@@ -34,5 +34,9 @@ public class Article {
     @Column(length = 500)
     private String videoUrl;
 
+    private int likes=0;
+
+    private int views=0;
+
     // getters and setters
 }

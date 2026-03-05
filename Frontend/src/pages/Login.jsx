@@ -26,14 +26,18 @@ function Login() {
       }
     });
 
-    const role = userRes.data.role;
+    const user = userRes.data;
 
-    console.log("Role from backend:", role);  // 👈 HERE
+    console.log("User from backend:", user);
 
-    localStorage.setItem("role", role);
+    // ⭐ store user
+    localStorage.setItem("user", JSON.stringify(user));
 
-    if (role === "ADMIN") navigate("/admin");
-    else if (role === "REPORTER") navigate("/dashboard");
+    // store role
+    localStorage.setItem("role", user.role);
+
+    if (user.role === "ADMIN") navigate("/admin");
+    else if (user.role === "REPORTER") navigate("/dashboard");
     else navigate("/");
 
   } catch (err) {

@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.*;
 import com.example.demo.repository.ArticleRepository;
+import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,14 +29,16 @@ public class ReporterController {
     private final ArticleRepository articleRepository;
     private  final  RatingRepository ratingRepository;
 
-
+    private final CommentRepository commentRepository;
 
     public ReporterController(UserRepository userRepository,
                               ArticleRepository articleRepository,
-                              RatingRepository ratingRepository) {
+                              RatingRepository ratingRepository,
+                              CommentRepository commentRepository) {
         this.userRepository = userRepository;
         this.articleRepository = articleRepository;
         this.ratingRepository= ratingRepository;
+        this.commentRepository=commentRepository;
     }
 
     @GetMapping("/{id}")
@@ -62,7 +65,10 @@ public class ReporterController {
                         a.getCreatedAt(),
                         a.getStatus().name(),
                         a.getImageUrl(),       // 🔥 added
-                        a.getVideoUrl()        // 🔥 added
+                        a.getVideoUrl(),       // 🔥 added
+                        a.getLikes(),
+                        a.getViews(),
+                        commentRepository.countByArticleId(a.getId())
                 ))
                 .toList();
 
@@ -171,7 +177,10 @@ public class ReporterController {
                         a.getCreatedAt(),
                         a.getStatus().name(),
                         a.getImageUrl(),       // add this
-                        a.getVideoUrl()        // add this
+                        a.getVideoUrl(),// add this
+                        a.getLikes(),
+                        a.getViews(),
+                        commentRepository.countByArticleId(a.getId())
                 ))
                 .toList();
 

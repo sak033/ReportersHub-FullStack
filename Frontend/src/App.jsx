@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import CreateArticle from "./pages/CreateArticle"; 
 import ArticleDetails from "./pages/ArticleDetails";
 import EditArticle from "./pages/EditArticle.jsx"; 
+import SavedArticles from "./pages/SavedArticles";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
   <Route path="/admin" element={<AdminDashboard />} />
   <Route path="/article/:id" element={<ArticleDetails />} />
 <Route path="/edit-article/:id" element={<EditArticle />} />
+<Route path="/saved" element={<SavedArticles />} />
   </Routes>
   </>
   )

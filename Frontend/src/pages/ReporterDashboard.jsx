@@ -16,6 +16,8 @@ const [editName, setEditName] = useState("");
 const [editAbout, setEditAbout] = useState("");
 const [editImage, setEditImage] = useState(null);
 const [openMenuId, setOpenMenuId] = useState(null);
+const [tab, setTab] = useState("created");
+const [savedArticles, setSavedArticles] = useState([]);
 
 const navigate =useNavigate();
 
@@ -33,6 +35,12 @@ const navigate =useNavigate();
       setLoading(false);
       setEditName(res.data.name);
       setEditAbout(res.data.about || "");
+      axios
+  .get("http://localhost:8080/articles/saved-articles", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  .then(res => setSavedArticles(res.data))
+  .catch(err => console.error(err));
 
       // AFTER getting dashboard data, fetch ranking
       return axios.get("http://localhost:8080/reporters/top");
@@ -310,107 +318,177 @@ const handleDelete = async (articleId) => {
 
         {/* My Articles Section */}
         <div>
+<div className="flex gap-8 border-b mb-6">
+
+<button
+onClick={() => setTab("created")}
+className={`pb-2 font-semibold ${
+tab === "created"
+? "border-b-2 border-blue-600 text-blue-600"
+: "text-gray-400"
+}`}
+>
+Created
+</button>
+
+<button
+onClick={() => setTab("saved")}
+className={`pb-2 font-semibold ${
+tab === "saved"
+? "border-b-2 border-blue-600 text-blue-600"
+: "text-gray-400"
+}`}
+>
+Saved
+</button>
+
+</div>
+
+
           <div className="flex items-center justify-between mb-10">
-  <h2 className="text-3xl font-bold text-gray-900">
-    My Articles
-  </h2>
+  
 
   <span className="text-sm text-gray-500">
     {data.myArticles.length} Articles
   </span>
 </div>
+{tab === "created" ? (
 
-          {data.myArticles.length === 0 ? (
-            <p className="text-gray-500">You haven't written any articles yet.</p>
-          ) : (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-  {data.myArticles.map(article => (
-    <div
-      key={article.id}
-      onClick={() => navigate(`/article/${article.id}`)}
-      className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 cursor-pointer"
-    >
+data.myArticles.length === 0 ? (
+  <p className="text-gray-500">You haven't written any articles yet.</p>
+) : (
 
-      {/* IMAGE */}
-      <div className="relative h-48 bg-gray-100 overflow-hidden">
-        {article.imageUrl ? (
-          <img
-            src={`http://localhost:8080${article.imageUrl}`}
-            alt="Article"
-            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-            No Image
-          </div>
-        )}
+<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+{data.myArticles.map(article => (
+<div
+key={article.id}
+onClick={() => navigate(`/article/${article.id}`)}
+className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 cursor-pointer"
+>
 
-        {/* STATUS BADGE */}
-        <span
-          className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow ${
-            article.status === "APPROVED"
-              ? "bg-green-500 text-white"
-              : article.status === "PENDING"
-              ? "bg-yellow-500 text-white"
-              : "bg-red-500 text-white"
-          }`}
-        >
-          {article.status}
-        </span>
-
-        {/* 3 DOT MENU BUTTON */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpenMenuId(openMenuId === article.id ? null : article.id);
-          }}
-          className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-full shadow hover:bg-white"
-        >
-          ⋮
-        </button>
-
-        {/* DROPDOWN MENU */}
-        {openMenuId === article.id && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="absolute top-12 right-3 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20"
-          >
-            <button
-              onClick={() => navigate(`/edit-article/${article.id}`)}
-              className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-            >
-              Edit
-            </button>
-
-            <button
-              onClick={() => handleDelete(article.id)}
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-            >
-              Delete
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* CONTENT */}
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-          {article.title}
-        </h3>
-
-        <p className="text-sm text-gray-500 mt-2">
-          {new Date(article.createdAt).toLocaleDateString()}
-        </p>
-
-        <p className="text-gray-600 text-sm mt-4 line-clamp-3">
-          {article.content}
-        </p>
-      </div>
-
-    </div>
-  ))}
+{/* IMAGE */}
+<div className="relative h-48 bg-gray-100 overflow-hidden">
+{article.imageUrl ? (
+<img
+src={`http://localhost:8080${article.imageUrl}`}
+alt="Article"
+className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+/>
+) : (
+<div className="flex items-center justify-center h-full text-gray-400 text-sm">
+No Image
 </div>
-          )}
+)}
+
+{/* STATUS BADGE */}
+<span
+className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow ${
+article.status === "APPROVED"
+? "bg-green-500 text-white"
+: article.status === "PENDING"
+? "bg-yellow-500 text-white"
+: "bg-red-500 text-white"
+}`}
+>
+{article.status}
+</span>
+
+{/* 3 DOT MENU BUTTON */}
+<button
+onClick={(e) => {
+e.stopPropagation();
+setOpenMenuId(openMenuId === article.id ? null : article.id);
+}}
+className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-full shadow hover:bg-white"
+>
+⋮
+</button>
+
+{/* DROPDOWN MENU */}
+{openMenuId === article.id && (
+<div
+onClick={(e) => e.stopPropagation()}
+className="absolute top-12 right-3 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20"
+>
+<button
+onClick={() => navigate(`/edit-article/${article.id}`)}
+className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+>
+Edit
+</button>
+
+<button
+onClick={() => handleDelete(article.id)}
+className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+>
+Delete
+</button>
+</div>
+)}
+
+</div>
+
+{/* CONTENT */}
+<div className="p-6">
+<h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+{article.title}
+</h3>
+
+<p className="text-sm text-gray-500 mt-2">
+{new Date(article.createdAt).toLocaleDateString()}
+</p>
+
+<p className="text-gray-600 text-sm mt-4 line-clamp-3">
+{article.content}
+</p>
+</div>
+
+</div>
+))}
+</div>
+
+)
+
+) : (
+
+savedArticles.length === 0 ? (
+<p className="text-gray-500">No saved articles yet.</p>
+) : (
+
+<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+{savedArticles.map(article => (
+<div
+key={article.id}
+onClick={() => navigate(`/article/${article.id}`)}
+className="relative group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 cursor-pointer"
+>
+
+<div className="relative h-48 bg-gray-100 overflow-hidden">
+{article.imageUrl && (
+<img
+src={`http://localhost:8080${article.imageUrl}`}
+className="w-full h-full object-cover"
+/>
+)}
+</div>
+
+<div className="p-6">
+<h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+{article.title}
+</h3>
+
+<p className="text-sm text-gray-500 mt-2">
+{new Date(article.createdAt).toLocaleDateString()}
+</p>
+</div>
+
+</div>
+))}
+</div>
+
+)
+
+)}
         </div>
 
       </div>

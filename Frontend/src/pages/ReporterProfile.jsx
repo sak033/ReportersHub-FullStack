@@ -45,6 +45,29 @@ function ReporterProfile() {
   }
 };
 
+
+const handleShare = (e, articleId, title) => {
+
+  e.preventDefault();
+
+  const url = `${window.location.origin}/article/${articleId}`;
+
+  if (navigator.share) {
+
+    navigator.share({
+      title: title,
+      url: url
+    });
+
+  } else {
+
+    navigator.clipboard.writeText(url);
+    alert("Link copied to clipboard!");
+
+  }
+
+};
+
   return (
   <div className="min-h-screen bg-gray-50">
 
@@ -228,18 +251,31 @@ function ReporterProfile() {
   <div className="flex items-center gap-3">
 
     <button
-      onClick={(e)=>e.preventDefault()}
-      className="hover:text-yellow-500"
-    >
-      <Bookmark size={18}/>
-    </button>
+  onClick={async (e) => {
 
+    e.preventDefault();
+
+    try {
+
+      const res = await api.post(`/articles/${article.id}/save`);
+
+      alert(res.data);
+
+    } catch (err) {
+      console.error(err);
+    }
+
+  }}
+  className="hover:text-yellow-500"
+>
+  <Bookmark size={18}/>
+</button>
     <button
-      onClick={(e)=>e.preventDefault()}
-      className="hover:text-green-500"
-    >
-      <Share2 size={18}/>
-    </button>
+  onClick={(e)=>handleShare(e, article.id, article.title)}
+  className="hover:text-green-500"
+>
+  <Share2 size={18}/>
+</button>
 
   </div>
 

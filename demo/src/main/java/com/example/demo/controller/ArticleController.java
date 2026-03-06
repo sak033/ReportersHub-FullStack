@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
+import com.example.demo.repository.SavedArticleRepository;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,12 +27,15 @@ public class ArticleController {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final ArticleLikeRepository articleLikeRepository;
+    private final SavedArticleRepository savedArticleRepository;
     public ArticleController(ArticleRepository articleRepository,
                              UserRepository userRepository,
-                             ArticleLikeRepository articleLikeRepository) {
+                             ArticleLikeRepository articleLikeRepository,
+                             SavedArticleRepository savedArticleRepository) {
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
         this.articleLikeRepository=articleLikeRepository;
+        this.savedArticleRepository=savedArticleRepository;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -216,5 +220,53 @@ public class ArticleController {
         articleRepository.save(article);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/save")
+    @PreAuthorize("isAuthenticated()")
+    public String toggleSave(@PathVariable Long id, Authentication authentication) {
+
+        User user = userRepository
+                .findByEmail(authentication.getName())
+                .orElseThrow();
+
+        Article article = articleRepository
+                .findById(id)
+                .orElseThrow();
+
+        Optional<SavedArticle> existing =
+                savedArticleRepository.findByUserAndArticle(user, article);
+
+        if (existing.isPresent()) {
+
+            savedArticleRepository.delete(existing.get());
+            return "Article removed from saved";
+
+        } else {
+
+            SavedArticle saved = new SavedArticle();
+            saved.setUser(user);
+            saved.setArticle(article);
+            saved.setCreatedAt(LocalDateTime.now());
+
+            savedArticleRepository.save(saved);
+
+            return "Article saved";
+        }
+    }
+
+    @GetMapping("/saved-articles")
+    @PreAuthorize("isAuthenticated()")
+    public List<Article> getSavedArticles(Authentication authentication) {
+
+        User user = userRepository
+                .findByEmail(authentication.getName())
+                .orElseThrow();
+
+        List<SavedArticle> saved = savedArticleRepository.findByUser(user);
+
+        return saved.stream()
+                .map(SavedArticle::getArticle)
+                .toList();
     }
 }

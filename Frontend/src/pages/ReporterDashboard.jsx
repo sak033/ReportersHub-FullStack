@@ -50,8 +50,8 @@ const navigate =useNavigate();
 
       // Find current reporter position
       const index = reporters.findIndex(
-        r => r.id === data?.id || r.name === data?.name
-      );
+  r => r.id === res.data.id
+);
 
       if (index !== -1) {
         setRank(index + 1);

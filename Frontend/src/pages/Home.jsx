@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api";
 import { Link } from "react-router-dom";
 import Banner from "../assets/Banner.png";  
+import { Heart, MessageCircle, Bookmark, Share2, Eye } from "lucide-react";
 
 function Home() {
   const [articles, setArticles] = useState([]);
@@ -55,6 +56,38 @@ function Home() {
   } catch (err) {
     alert("You may have already requested or are already a reporter.");
   }
+};
+
+const handleLike = async (e, articleId) => {
+  e.preventDefault();
+
+  try {
+    await api.post(`/articles/${articleId}/like`);
+
+    const res = await api.get("/articles/public");
+    setArticles(res.data);
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleShare = (e, articleId, title) => {
+
+  e.preventDefault();
+
+  const url = `${window.location.origin}/article/${articleId}`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      url: url
+    });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert("Link copied!");
+  }
+
 };
 
   return (
@@ -165,7 +198,8 @@ function Home() {
 
   <div className="grid md:grid-cols-3 gap-10">
     {articles.map(article => (
-      <div
+  <Link
+    to={`/article/${article.id}`}
         key={article.id}
         className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-2 hover:shadow-xl transition duration-300"
       >
@@ -196,10 +230,74 @@ function Home() {
           {article.content}
         </p>
 
-        <p className="text-sm text-gray-400">
-          By {article.reporterName || "Reporter"}
-        </p>
-      </div>
+        <p className="text-sm text-gray-400 mb-3">
+  By {article.reporterName || "Reporter"}
+</p>
+
+{/* ARTICLE ENGAGEMENT */}
+<div className="flex items-center justify-between pt-3 border-t text-gray-500">
+
+  <div className="flex items-center gap-4">
+
+    <button
+  onClick={(e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    handleLike(e, article.id);
+  }}
+  className="flex items-center gap-1 hover:text-red-500"
+>
+      <Heart size={18}/>
+      <span className="text-sm">{article.likes || 0}</span>
+    </button>
+
+    <button
+  onClick={(e) => {
+    e.preventDefault();
+    window.location.href = `/article/${article.id}#comments`;
+  }}
+  className="flex items-center gap-1 hover:text-blue-500"
+>
+  <MessageCircle size={18}/>
+  <span className="text-sm">{article.commentsCount || 0}</span>
+</button>
+
+    <div className="flex items-center gap-1">
+      <Eye size={18}/>
+      <span className="text-sm">{article.views || 0}</span>
+    </div>
+
+  </div>
+
+  <div className="flex items-center gap-3">
+
+    <button
+  onClick={async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const res = await api.post(`/articles/${article.id}/save`);
+alert(res.data);
+  }}
+  className="hover:text-yellow-500"
+>
+  <Bookmark size={18}/>
+</button>
+
+    <button
+      onClick={(e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  handleShare(e, article.id, article.title);
+}}
+      className="hover:text-green-500"
+    >
+      <Share2 size={18}/>
+    </button>
+
+  </div>
+
+</div>
+      </Link>
     ))}
   </div>
 </div>

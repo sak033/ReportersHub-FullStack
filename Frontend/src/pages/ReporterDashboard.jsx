@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Heart, MessageCircle, Eye } from "lucide-react";
 
 export default function ReporterDashboard() {
   const [data, setData] = useState(null);
@@ -441,6 +442,24 @@ Delete
 <p className="text-gray-600 text-sm mt-4 line-clamp-3">
 {article.content}
 </p>
+<div className="flex items-center gap-5 mt-4 pt-3 border-t text-gray-500 text-sm">
+
+  <div className="flex items-center gap-1">
+    <Heart size={16}/>
+    <span>{article.likes || 0}</span>
+  </div>
+
+  <div className="flex items-center gap-1">
+    <MessageCircle size={16}/>
+    <span>{article.commentsCount || 0}</span>
+  </div>
+
+  <div className="flex items-center gap-1">
+    <Eye size={16}/>
+    <span>{article.views || 0}</span>
+  </div>
+
+</div>
 </div>
 
 </div>

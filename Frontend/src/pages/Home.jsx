@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api";
 import { Link } from "react-router-dom";
 import Banner from "../assets/Banner.png";  
-import { Heart, MessageCircle, Bookmark, Share2, Eye } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, Share2, Eye, Compass, Newspaper, UserPlus } from "lucide-react";
 
 function Home() {
   const [articles, setArticles] = useState([]);
@@ -108,44 +108,82 @@ const handleShare = (e, articleId, title) => {
   {/* Text Content */}
   <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 text-white">
     
-    <h1 className="text-5xl font-bold mb-6 tracking-wide">
+    <h1 className="text-5xl font-bold mb-3 tracking-wide">
       GLOBAL NEWS REPORTING
     </h1>
 
-    <p className="text-blue-100 text-lg mb-10">
+    <p className="text-blue-100 text-lg mb-6">
       Trusted Journalism Powered by Community Ratings
     </p>
 
-    <div className="flex justify-center gap-6">
-      <button className="bg-white text-blue-800 font-semibold px-6 py-3 rounded-lg hover:bg-gray-300 transition">
-        Explore Articles
-      </button>
+  
+<div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 flex-wrap">
 
-    
-      
-      {!currentUser ? (
-  <button
-    onClick={() => navigate("/login")}
-    className="bg-blue-500 px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
+  {/* EXPLORE */}
+  <Link
+    to="/explore"
+    className="flex items-center justify-center gap-2 bg-white text-blue-800 font-semibold 
+    px-5 py-2 sm:px-6 sm:py-3 
+    text-sm sm:text-base 
+    rounded-full shadow-md 
+    hover:shadow-xl hover:-translate-y-1 transition"
   >
-    Become Reporter
-  </button>
-) : currentUser.role === "REPORTER" ? (
-  <button
-    disabled
-    className="bg-gray-400 px-6 py-3 rounded-lg cursor-not-allowed"
+    <Compass size={18}/>
+    Explore Articles
+  </Link>
+
+  {/* FEED */}
+  <Link
+    to="/feed"
+    className="flex items-center justify-center gap-2 
+    bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold 
+    px-5 py-2 sm:px-6 sm:py-3 
+    text-sm sm:text-base 
+    rounded-full shadow-md 
+    hover:shadow-xl hover:-translate-y-1 transition"
   >
-    You are a Reporter
-  </button>
-) : (
-  <button
-    onClick={handleBecomeReporter}
-    className="bg-blue-500 px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
-  >
-    Become Reporter
-  </button>
-)}
-    </div>
+    <Newspaper size={18}/>
+    News Feed
+  </Link>
+
+  {/* REPORTER */}
+
+  {!currentUser ? (
+    <button
+      onClick={() => navigate("/login")}
+      className="flex items-center justify-center gap-2 
+      bg-blue-600 text-white font-semibold 
+      px-5 py-2 sm:px-6 sm:py-3 
+      text-sm sm:text-base 
+      rounded-full shadow-md 
+      hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 transition"
+    >
+      <UserPlus size={18}/>
+      Become Reporter
+    </button>
+  ) : currentUser.role === "REPORTER" ? (
+    <button
+      disabled
+      className="bg-gray-400 text-white px-5 py-2 sm:px-6 sm:py-3 rounded-full cursor-not-allowed text-sm sm:text-base"
+    >
+      You are a Reporter
+    </button>
+  ) : (
+    <button
+      onClick={handleBecomeReporter}
+      className="flex items-center justify-center gap-2 
+      bg-blue-600 text-white font-semibold 
+      px-5 py-2 sm:px-6 sm:py-3 
+      text-sm sm:text-base 
+      rounded-full shadow-md 
+      hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 transition"
+    >
+      <UserPlus size={18}/>
+      Become Reporter
+    </button>
+  )}
+
+</div>
 
   </div>
 </div>

@@ -11,6 +11,9 @@ import CreateArticle from "./pages/CreateArticle";
 import ArticleDetails from "./pages/ArticleDetails";
 import EditArticle from "./pages/EditArticle.jsx"; 
 import SavedArticles from "./pages/SavedArticles";
+import Explore from "./pages/Explore";
+import Feed from "./pages/Feed";
+
 
 function App() {
   return (
@@ -28,6 +31,8 @@ function App() {
   <Route path="/article/:id" element={<ArticleDetails />} />
 <Route path="/edit-article/:id" element={<EditArticle />} />
 <Route path="/saved" element={<SavedArticles />} />
+<Route path="/explore" element={<Explore />} />
+<Route path="/feed" element={<Feed />} />
   </Routes>
   </>
   )

@@ -1,10 +1,10 @@
-📰 ReportersHub
+# 📰 ReportersHub
 
 ReportersHub is a full-stack news platform where community reporters publish articles and users discover news through ratings, engagement, and a modern feed experience.
 
 The platform focuses on community-driven journalism, allowing users to follow reporters, read verified articles, and interact through likes, comments, and views.
 
-🚀 Features
+# 🚀 Features
 👤 User System
 
 User registration & login
@@ -77,7 +77,7 @@ Moderate articles
 
 Manage platform content
 
-🏗 Tech Stack
+# 🏗 Tech Stack
 Frontend
 
 React
@@ -102,7 +102,7 @@ Database
 
 MySQL
 
-📂 Project Structure
+# 📂 Project Structure
 reportershub
 │
 ├── frontend (React)
@@ -122,16 +122,15 @@ reportershub
 │   └── model
 │
 └── database
-📸 Screenshots
+
+# 📸 Screenshots
 
 You can add screenshots here after pushing to GitHub.
 
 Example:
 
-/screenshots/homepage.png
-/screenshots/explore.png
-/screenshots/feed.png
-⚙️ Installation & Setup
+
+# ⚙️ Installation & Setup
 1️⃣ Clone Repository
 git clone https://github.com/yourusername/reportershub.git
 2️⃣ Backend Setup (Spring Boot)
@@ -147,6 +146,7 @@ mvn spring-boot:run
 Backend runs on:
 
 http://localhost:8080
+
 3️⃣ Frontend Setup (React)
 
 Navigate to frontend folder.
@@ -164,7 +164,8 @@ npm run dev
 Frontend runs on:
 
 http://localhost:5173
-🧠 Key Design Decisions
+
+# 🧠 Key Design Decisions
 
 Role-based system to manage reporters and users
 
@@ -176,7 +177,7 @@ Vertical feed UI for fast news consumption
 
 Admin moderation layer to maintain content quality
 
-📈 Future Improvements
+# 📈 Future Improvements
 
 AI powered fake news detection
 
@@ -188,7 +189,7 @@ Notification system
 
 Mobile app version
 
-👩‍💻 Author
+# 👩‍💻 Author
 
 Sakshi Kuthe
 

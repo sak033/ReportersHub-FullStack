@@ -1,4 +1,4 @@
-# 📰 ReportersHub
+![Public Profile](https://github.com/user-attachments/assets/be6cc5c0-4651-4641-9355-26fc1277698f)# 📰 ReportersHub
 
 ReportersHub is a full-stack news platform where community reporters publish articles and users discover news through ratings, engagement, and a modern feed experience.
 
@@ -125,9 +125,14 @@ reportershub
 
 # 📸 Screenshots
 
-You can add screenshots here after pushing to GitHub.
-
-Example:
+## Home Page
+![Home Page](https://github.com/user-attachments/assets/ce2c2353-3cba-48e4-adf8-28ca5976e6a4)
+## Reporter's Public Profile
+![Public Profile](https://github.com/user-attachments/assets/201b75af-4581-4683-a3ba-6617ba65fa65)
+## Reporter's Profile
+![Reporter&#39;s Profile](https://github.com/user-attachments/assets/0e763c37-655c-4334-a7d2-58f12790fd22)
+## Explore Page
+![Explore page](https://github.com/user-attachments/assets/deed1d71-db87-4e29-a58c-e6be60edb74c)
 
 
 # ⚙️ Installation & Setup
